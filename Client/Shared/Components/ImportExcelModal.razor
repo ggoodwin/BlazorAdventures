@@ -1,0 +1,42 @@
+﻿<EditForm Model="@UploadRequest" OnValidSubmit="SaveAsync">
+    <FluentValidationValidator @ref="_fluentValidationValidator" />
+    <MudDialog>
+        <TitleContent>
+            Import - @ModelName
+        </TitleContent>
+        <DialogContent>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudButton HtmlTag="label"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Filled.CloudUpload"
+                               for="fileInput"
+                               Class="mb-1">
+                        Upload
+                    </MudButton>
+                    <InputFile id="fileInput" hidden OnChange="UploadFiles" accept=".xlsx" />
+                    <br />
+                    <br />
+                    @if (_file != null && !string.IsNullOrEmpty(_file.Name))
+                    {
+                        <MudAlert ShowCloseIcon="true" CloseIconClicked="(() => _file = null)" OnClick="(() => _file = null)">@_file.Name</MudAlert>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info">Please upload excel file!</MudAlert>
+                    }
+                </MudItem>
+            </MudGrid>
+        </DialogContent>
+        <DialogActions>
+            <MudButton DisableElevation Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+            <MudButton DisableElevation Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(_file == null)" Color="Color.Success">Import</MudButton>
+        </DialogActions>
+
+    </MudDialog>
+    <MudOverlay Visible="_uploading" LightBackground="true" Absolute="true">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </MudOverlay>
+</EditForm>

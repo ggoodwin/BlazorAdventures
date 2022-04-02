@@ -1,0 +1,96 @@
+﻿@page "/stamps"
+@using Application.Features.Stamps.Queries.GetAll
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+</style>
+
+<HeroTitle Title="Time Stamps" Description="3 Hour Interval Stamps" Icon="@CustomIcons.TimeStamp" />
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Hover="true" Elevation="25" Items="_stampList" Dense="@_dense" Bordered="@_bordered" Striped="@_striped" Filter="new Func<GetAllStampsResponse, bool>(Search)" @bind-brand="_stamps">
+        <ToolBarContent>
+            <div class="justify-center mud-text-align-center">
+                @if (_canCreateStamps)
+                {
+                    <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" OnClick="AddStamp" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">Create</MudButton>
+                    @if (_canImportStamps)
+                    {
+                        <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" OnClick="InvokeImportModal" StartIcon="@Icons.Material.Filled.FileUpload" IconColor="Color.Surface" Style="margin-left: 5px;">Import</MudButton>
+                    }
+
+                    <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetStampAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">Reload</MudButton>
+                    @if (_canExportStamps)
+                    {
+                        <MudButton DisableElevation Variant="Variant.Filled" OnClick="ExportToExcel" StartIcon="@Icons.Custom.FileFormats.FileExcel" IconColor="Color.Secondary" Color="Color.Surface" Style="margin-left: 5px;">Export</MudButton>
+                    }
+                }
+                else
+                {
+                    <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetStampAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">Reload</MudButton>
+                    @if (_canExportStamps)
+                    {
+                        <MudButton DisableElevation Variant="Variant.Filled" OnClick="ExportToExcel" StartIcon="@Icons.Custom.FileFormats.FileExcel" IconColor="Color.Secondary" Color="Color.Surface" Style="margin-left: 5px;">Export</MudButton>
+                    }
+                }
+            </div>
+            <MudSpacer />
+            @if (_canSearchStamps)
+            {
+                <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search for Time Stamps" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+            }
+            <MudText Typo="Typo.h6">Next Time: @_nextTime</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<GetAllStampsResponse, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<GetAllStampsResponse, object>(x => x.TheStamp.ToLocalTime())">Time Stamp</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:right">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="TheStamp">
+                <MudHighlighter Text="@context.TheStamp.ToLocalTime().ToShortTimeString()" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Actions" Style="text-align: right">
+                @if (_canEditStamps || _canDeleteStamps)
+                {
+                    <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" EndIcon="@Icons.Filled.KeyboardArrowDown" IconColor="Color.Secondary" Direction="Direction.Left" OffsetX="true">
+                        @if (_canEditStamps)
+                        {
+                            <MudMenuItem @onclick="@(() => InvokeModal(@context.Id))">Edit</MudMenuItem>
+                        }
+                        @if (_canDeleteStamps)
+                        {
+                            <MudMenuItem @onclick="@(() => Delete(@context.Id))">Delete</MudMenuItem>
+                        }
+                    </MudMenu>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled"
+                               DisableElevation="true"
+                               StartIcon="@Icons.Material.Filled.DoNotTouch"
+                               IconColor="Color.Secondary"
+                               Size="Size.Small"
+                               Color="Color.Surface">
+                        No Allowed Actions
+                    </MudButton>
+                }
+            </MudTd>
+        </RowTemplate>
+        @*<FooterContent>
+            <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Dense"]</MudSwitch>
+            <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary" Style="margin-left: 5px;">@_localizer["Striped"]</MudSwitch>
+            <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning" Style="margin-left: 5px;">@_localizer["Bordered"]</MudSwitch>
+        </FooterContent>*@
+        <PagerContent>
+            <TablePager />
+        </PagerContent>
+    </MudTable>
+}

@@ -1,0 +1,20 @@
+﻿@namespace Client.Shared.Components
+
+<MudCard Elevation="0" Square="true">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudIcon Icon="@Icon" Size="Size.Large" ViewBox="0 0 700 500" Style="height:100px; width:100px;"></MudIcon>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-2">@Title</MudText>
+            <MudText Color="Color.Surface" Class="mb-4">@Description</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+</MudCard>
+
+@code
+{
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Description { get; set; }
+    [Parameter] public string Icon { get; set; }
+}
